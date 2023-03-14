@@ -1,7 +1,7 @@
-import { OrderItemType } from './../TypeDefs/OrderItem';
+import { OrderItemType } from '../TypeDefs/OrderItem';
 import { GraphQLID, GraphQLList } from 'graphql';
-import { OrderItemService } from './../../service/OrderItemService';
-import { OrderItemRepository } from './../../repository/OrderItemRepository';
+import { OrderItemService } from '../../service/OrderItemService';
+import { OrderItemRepository } from '../../repository/OrderItemRepository';
 import { Payment } from '../../models/Payment';
 import { BaseRepository } from '../../repository/BaseRepository';
 import { PaymentService } from '../../service/PaymentService';

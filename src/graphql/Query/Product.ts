@@ -1,7 +1,7 @@
-import { ProductService } from './../../service/ProductService';
+import { ProductService } from '../../service/ProductService';
 import { BaseRepository } from '../../repository/BaseRepository';
-import { IProduct } from './../../interfaces/IProduct';
-import { ProductType } from './../TypeDefs/Product';
+import { IProduct } from '../../interfaces/IProduct';
+import { ProductType } from '../TypeDefs/Product';
 import { Product } from '../../models/Product';
 import { GraphQLID, GraphQLList } from 'graphql';
 

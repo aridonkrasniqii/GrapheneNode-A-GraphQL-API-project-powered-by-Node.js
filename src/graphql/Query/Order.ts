@@ -1,4 +1,4 @@
-import { OrderService } from './../../service/OrderService';
+import { OrderService } from '../../service/OrderService';
 import { GraphQLID, GraphQLList } from 'graphql';
 import { Order } from '../../models/Order';
 import { IOrder } from '../../interfaces/IOrder';

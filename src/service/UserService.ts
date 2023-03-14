@@ -3,6 +3,7 @@ import { User } from '../models/User';
 import { UserRepository } from '../repository/UserRepository';
 import bcrypt from 'bcryptjs';
 import { SecUtils } from '../utils/SecUtils';
+import { IUserContext } from '../interfaces/IUserContext';
 
 export class UserService {
 	constructor(private userRepository: UserRepository) {}
@@ -24,6 +25,10 @@ export class UserService {
 
 	getUserById = async (user_id: number): Promise<IUser> => {
 		return this.userRepository.getEntityById(user_id);
+	};
+
+	getUserByEmail = async (email: string): Promise<IUser> => {
+		return this.userRepository.getUserByEmail(email);
 	};
 
 	deleteUser = async (user_id: number): Promise<IUser> => {
@@ -61,6 +66,18 @@ export class UserService {
 			user.email,
 			await SecUtils.generateHash(newPassword)
 		);
-		return this.userRepository.changePassword(user.user_id as any, newUser);
+		return this.userRepository.changePassword(user.user_id!, newUser);
+	};
+
+	login = async (email: string, password: string): Promise<IUserContext> => {
+		const user: IUser = await this.userRepository.findByCredentials(
+			email,
+			password
+		);
+		const token = SecUtils.signToken(user.user_id!); // ! ! => means I know that this can be undefined
+		return {
+			token,
+			user
+		};
 	};
 }

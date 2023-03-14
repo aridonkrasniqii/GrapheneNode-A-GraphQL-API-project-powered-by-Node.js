@@ -7,6 +7,7 @@ import { promisify } from 'util';
 import crypto from 'crypto';
 declare module 'dotenv';
 export class SecUtils {
+	static secret: any = process.env.JWT_SECRET;
 	static generateHash = async (password: string) => {
 		const salt = await bcrypt.genSalt(10);
 		return bcrypt.hash(password, salt);
@@ -17,13 +18,15 @@ export class SecUtils {
 	};
 
 	static signToken = (id: number) => {
-		const secret: Secret | undefined = process.env.JWT_SECRET;
+		if (!SecUtils.secret) throw new Error('Secret is not defined for jwt');
 
-		if (!secret) throw new Error('Secret is not defined for jwt');
-
-		return jwt.sign({ id }, secret, {
+		return jwt.sign({ userId: id }, SecUtils.secret, {
 			expiresIn: process.env.JWT_EXPIRES_IN
 		});
+	};
+
+	static verifyToken = (token: string) => {
+		return jwt.verify(token, SecUtils.secret);
 	};
 
 	static createSendToken = async (
@@ -40,7 +43,7 @@ export class SecUtils {
 			httpOnly: true
 		};
 
-		res.cookie('jwt', token, cookieOptions);
+		// res.cookie('jwt', token, cookieOptions);
 
 		// res.status(statusCode).json({ // ! RESOLVE THE RESULT
 		//   status: 'success',
