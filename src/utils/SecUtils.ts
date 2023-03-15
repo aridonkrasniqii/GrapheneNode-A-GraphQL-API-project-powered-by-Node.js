@@ -1,13 +1,14 @@
 import { IUser } from './../interfaces/IUser';
-import { AppError } from './AppError';
+// import { AppError } from './ErrorHandler';
 import { Request, NextFunction } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt, { Secret } from 'jsonwebtoken';
 import { promisify } from 'util';
 import crypto from 'crypto';
+
 declare module 'dotenv';
+
 export class SecUtils {
-	static secret: any = process.env.JWT_SECRET;
 	static generateHash = async (password: string) => {
 		const salt = await bcrypt.genSalt(10);
 		return bcrypt.hash(password, salt);
@@ -18,17 +19,31 @@ export class SecUtils {
 	};
 
 	static signToken = (id: number) => {
-		if (!SecUtils.secret) throw new Error('Secret is not defined for jwt');
+		const secret: string | undefined = process.env.JWT_SECRET;
 
-		return jwt.sign({ userId: id }, SecUtils.secret, {
+		if (!secret) throw new Error('Secret is not defined for jwt');
+
+		return jwt.sign({ userId: id }, secret, {
 			expiresIn: process.env.JWT_EXPIRES_IN
 		});
 	};
 
-	static verifyToken = (token: string) => {
-		return jwt.verify(token, SecUtils.secret);
+	static verifyToken = async (token: string) => {
+		const secret: string | undefined = process.env.JWT_SECRET;
+		if (!secret) throw new Error('Secret is not defined for jwt');
+		return jwt.verify(token, secret);
 	};
 
+	static validateTokenFormat = (token: string) => {
+		const tokenParts = token.split('.');
+		if (
+			tokenParts.length === 3 &&
+			/^[A-Za-z0-9-_=]+(\.[A-Za-z0-9-_=]+){2}$/.test(token)
+		) {
+			return true;
+		}
+		return false;
+	};
 	static createSendToken = async (
 		user: IUser,
 		statusCode: number,
@@ -64,9 +79,8 @@ export class SecUtils {
 		}
 
 		if (!token) {
-			return next(
-				new AppError('You are not logged in! Please login to get access', 401)
-			);
+			return next();
+			// new AppError('You are not logged in! Please login to get access', 401)
 		}
 		const secret: string = process.env.JWT_SECRET ?? '';
 

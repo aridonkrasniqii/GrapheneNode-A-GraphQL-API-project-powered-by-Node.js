@@ -18,10 +18,12 @@ export class UserRepository extends BaseRepository<IUser> {
 			throw new Error('User not found');
 		}
 
-		if (await SecUtils.compare(password, user.password)) {
-			return user;
+		const passwordMatches = await SecUtils.compare(password, user.password);
+
+		if (!passwordMatches) {
+			throw new Error('Invalid credentials');
 		}
-		return null as any;
+		return user;
 	};
 
 	changePassword = async (user_id: number, user: User): Promise<IUser> => {
@@ -37,5 +39,8 @@ export class UserRepository extends BaseRepository<IUser> {
 			throw new AuthenticationError('User not found');
 		}
 		return rows[0] || null;
-	};
+	}; 
+	
+	
+
 }
