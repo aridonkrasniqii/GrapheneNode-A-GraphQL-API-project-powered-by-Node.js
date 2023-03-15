@@ -10,7 +10,7 @@ interface ValidationError extends Error {
 	errors: Record<string, any>;
 }
 
-class ErrorHandler {
+class GraphQLErrorHandler {
 	private handleCastError = (error: CastError) => {
 		const message = `Invalid ${error.path}: ${error.value}`;
 		throw new ApolloError(message, 'GRAPHQL_VALIDATION_FAILED');
