@@ -19,6 +19,7 @@ export const CREATE_USER = {
 	},
 	async resolve(_: any, args: any) {
 		const { first_name, last_name, username, email, password } = args;
+
 		return userService.createUser(
 			first_name,
 			last_name,

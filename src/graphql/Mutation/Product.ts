@@ -8,7 +8,7 @@ const productRepository = new BaseRepository<Product>('products');
 const productService = new ProductService(productRepository);
 
 export const CREATE_PRODUCT = {
-	type: ProductTyp,
+	type: ProductType,
 	args: {
 		name: { type: GraphQLString },
 		description: { type: GraphQLString },

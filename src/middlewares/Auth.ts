@@ -1,8 +1,7 @@
-import { IUser } from './../interfaces/IUser';
-import { NextFunction, Request } from 'express';
-import { SecUtils } from './../utils/SecUtils';
-import { UserService } from './../service/UserService';
-import jwt, { decode, JwtPayload } from 'jsonwebtoken';
+import { UserUtil } from './../utils/UserUtil';
+import { UserValidator } from './../validators/UserValidator';
+import { NextFunction } from 'express';
+import { JwtPayload } from 'jsonwebtoken';
 import { AuthenticationError } from 'apollo-server-express';
 interface AuthorizationHeader {
 	authorization?: string;
@@ -28,7 +27,7 @@ export class AuthMiddleware {
 
 		const token = authorizationHeader.split(' ')[1];
 
-		if (!SecUtils.validateTokenFormat(token)) {
+		if (!UserValidator.validateTokenFormat(token)) {
 			throw new Error('Invalid token format');
 		}
 
@@ -36,7 +35,7 @@ export class AuthMiddleware {
 			throw new AuthenticationError('Invalid/Expired token');
 		}
 		try {
-			const payload = await SecUtils.verifyToken(token);
+			const payload = await UserUtil.verifyToken(token);
 			req.payload = payload;
 		} catch (err) {
 			next(new Error(err as any));

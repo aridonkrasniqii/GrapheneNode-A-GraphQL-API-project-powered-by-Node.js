@@ -2,7 +2,7 @@ import { AuthenticationError } from 'apollo-server-express';
 import { DatabaseConnection } from '../database/database';
 import { IUser } from '../interfaces/IUser';
 import { User } from '../models/User';
-import { SecUtils } from '../utils/SecUtils';
+import { UserUtil } from '../utils/UserUtil';
 import { BaseRepository } from './BaseRepository';
 
 export class UserRepository extends BaseRepository<IUser> {
@@ -18,7 +18,7 @@ export class UserRepository extends BaseRepository<IUser> {
 			throw new Error('User not found');
 		}
 
-		const passwordMatches = await SecUtils.compare(password, user.password);
+		const passwordMatches = await UserUtil.compare(password, user.password);
 
 		if (!passwordMatches) {
 			throw new Error('Invalid credentials');
@@ -39,8 +39,5 @@ export class UserRepository extends BaseRepository<IUser> {
 			throw new AuthenticationError('User not found');
 		}
 		return rows[0] || null;
-	}; 
-	
-	
-
+	};
 }

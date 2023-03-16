@@ -6,6 +6,7 @@ dotenv.config({ path: './config.env' });
 
 import { schema } from './graphql/schema';
 import express, { NextFunction } from 'express';
+import { GraphQLErrorHandler } from './middlewares/erros/GraphQLErrorHandler';
 
 const auth = new AuthMiddleware();
 
@@ -20,7 +21,8 @@ const auth = new AuthMiddleware();
 				}
 			});
 			return { req };
-		}
+		},
+		formatError: GraphQLErrorHandler.errorHandler
 	});
 	const app = express();
 

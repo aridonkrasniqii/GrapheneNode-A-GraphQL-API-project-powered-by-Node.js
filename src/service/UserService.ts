@@ -1,9 +1,12 @@
+import { UserValidator } from './../validators/UserValidator';
 import { IUser } from '../interfaces/IUser';
 import { User } from '../models/User';
 import { UserRepository } from '../repository/UserRepository';
-import bcrypt from 'bcryptjs';
-import { SecUtils } from '../utils/SecUtils';
 import { IUserContext } from '../interfaces/IUserContext';
+import { UserUtil } from '../utils/UserUtil';
+import { GraphQLError } from 'graphql';
+import { GraphQLErrorHandler } from '../middlewares/erros/GraphQLErrorHandler';
+import { ValidationError } from 'apollo-server-express';
 
 export class UserService {
 	constructor(private userRepository: UserRepository) {}
@@ -18,7 +21,16 @@ export class UserService {
 		email: string,
 		password: string
 	) => {
-		const hashed = await SecUtils.generateHash(password);
+		if (!UserValidator.validateEmail(email)) {
+			GraphQLErrorHandler.errorHandler(
+				new ValidationError('Please provide a valid email')
+			);
+		}
+		if (UserValidator.validatePassword(password)) {
+			GraphQLErrorHandler.errorHandler(new ValidationError('Weak password'));
+		}
+
+		const hashed = await UserUtil.generateHash(password);
 		const user = new User(first_name, last_name, username, email, hashed);
 		return this.userRepository.createEntity(user);
 	};
@@ -43,7 +55,7 @@ export class UserService {
 		email: string,
 		password: string
 	): Promise<IUser> => {
-		const hashed = await SecUtils.generateHash(password);
+		const hashed = await UserUtil.generateHash(password);
 		const user = new User(first_name, last_name, username, email, hashed);
 		return this.userRepository.updateEntity(user_id, user);
 	};
@@ -64,7 +76,7 @@ export class UserService {
 			user.last_name,
 			user.username,
 			user.email,
-			await SecUtils.generateHash(newPassword)
+			await UserUtil.generateHash(newPassword)
 		);
 		return this.userRepository.changePassword(user.user_id!, newUser);
 	};
@@ -74,7 +86,7 @@ export class UserService {
 			email,
 			password
 		);
-		const token = SecUtils.signToken(user.user_id!); // ! ! => means I know that this can be undefined
+		const token = UserUtil.signToken(user.user_id!);
 		return {
 			token,
 			user
